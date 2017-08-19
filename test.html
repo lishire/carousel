@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>轮播</title>
+    <style>
+        *{
+            margin: 0;
+            padding:0;
+        }
+        body{
+            padding: 20px;
+        }
+        #content{
+            position: relative;
+            width: 600px;
+            height: 400px;
+            border: 3px solid royalblue;
+            overflow: hidden;
+        }
+        #list{
+            width: 3000px;
+            height: 400px;
+            position: absolute;
+            z-index: 1;
+        }
+        #list img{
+            width: 600px;
+            height: 400px;
+            float:left;
+        }
+        #circle{
+            width:150px;
+            height: 10px;
+            position: absolute;
+            bottom: 20px;
+            left: 227px;
+            z-index: 2;
+            border: 0 solid brown;
+        }
+        #circle span{
+            width: 10px;
+            height: 10px;
+            cursor: pointer;
+            border: 1px solid wheat;
+            border-radius: 50%;
+            background-color:black;
+            float:left;
+            margin-left: 15px;
+        }
+        #circle .on{
+            background-color:tomato;
+        }
+        #box{
+            position: absolute;
+            top:150px;
+            z-index: 2;
+            width: 600px;
+            height: 40px;
+            font-size: 36px;
+            color: white;
+            line-height: 40px;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0.4;
+        }
+        #left{
+            float: left;
+            background-color: dimgray;
+        }
+        #right{
+            float: right;
+            background-color: dimgray;
+        }
+       #box span:hover{
+           background-color:lightpink;
+       }
+    </style>
+</head>
+<body>
+<div id="content">
+    <diV id="list" style="left: 0">
+
+        <img src="img/img1.jpg">
+        <img src="img/img2.jpg">
+        <img src="img/img3.jpg">
+        <img src="img/img1.jpg">
+        <img src="img/img2.jpg">
+    </diV>
+    <div id="circle">
+        <span index=1 class="on"></span>
+        <span index=2></span>
+        <span index=3></span>
+        <span index=4></span>
+        <span index=5></span>
+    </div>
+    <div id="box">
+        <span id="left">&lt</span>
+        <span id="right">&gt</span>
+    </div>
+
+</div>
+</body>
+<!--<script src="test.js"></script>-->
+<script>
+    window.onload = function(){
+        var content = document.getElementById("content");
+        var list = document.getElementById("list");
+        var left = document.getElementById("left");
+        var right = document.getElementById("right");
+        var circle = document.getElementById("circle").getElementsByTagName("span");
+        var index = 1;
+
+//        小圆点亮起
+         function showbutton(){
+             //关掉上一个小圆点亮起
+             for(var i=0;i<circle.length;i++){
+                 if(circle[i].className='on'){
+                     circle[i].className='';
+                     break;
+                 }
+             }
+             circle[index-1].className='on';
+         }
+         function animate(offset){
+             var newleft=parseInt(list.style.left)+offset;
+             list.style.left=newleft+"px";
+
+             //无限滚动 图片归为
+             if(newleft>-600){
+                 list.style.left=-2400+"px";
+             }
+             if(newleft<-2400){
+                 list.style.left=-600+"px";
+             }
+//             debugger;
+         }
+
+        left.onclick = function(){
+            if(index == 1){
+                index =5;
+            }
+            else{
+                index-=1;
+            }
+
+            showbutton();
+            animate(600);
+        }
+        right.onclick = function(){
+            if(index == 5){
+                index =1;
+            }
+            else{
+                index+=1;
+            }
+            showbutton();
+            animate(-600);
+        }
+        //按钮切换 offset:偏移量
+        for(var i=0;i<circle.length;i++){
+              circle[i].onclick=function(){
+                  //优化
+                  if(this.className=="on"){
+                      return;
+                  }
+                  //
+                  var myindex =parseInt(this.getAttribute('index'));
+                  var offset = (myindex-index)*-600;
+
+                  animate(offset);
+                  index=myindex;
+                  showbutton();
+              }
+        }
+
+    }
+</script>
+</html>
