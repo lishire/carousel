@@ -3,6 +3,7 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>轮播</title>
+
     <style>
         *{
             margin: 0;
@@ -23,6 +24,7 @@
             height: 400px;
             position: absolute;
             z-index: 1;
+            transition: all 0.5s ease-in-out;
         }
         #list img{
             width: 600px;
@@ -81,18 +83,18 @@
 <div id="content">
     <diV id="list" style="left: 0">
 
-        <img src="img/img1.jpg">
-        <img src="img/img2.jpg">
-        <img src="img/img3.jpg">
-        <img src="img/img1.jpg">
-        <img src="img/img2.jpg">
+        <img src="img/img1.jpg" alt="1">
+        <img src="img/img2.jpg" alt="2">
+        <img src="img/img3.jpg" alt="3">
+        <img src="img/img1.jpg" alt="4">
+        <img src="img/img2.jpg" alt="5">
     </diV>
     <div id="circle">
-        <span index=1 class="on"></span>
-        <span index=2></span>
-        <span index=3></span>
-        <span index=4></span>
-        <span index=5></span>
+        <span class="on"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
     <div id="box">
         <span id="left">&lt</span>
@@ -101,78 +103,87 @@
 
 </div>
 </body>
-<!--<script src="test.js"></script>-->
+<script type="text/javascript" src="test.js"></script>
 <script>
-    window.onload = function(){
-        var content = document.getElementById("content");
-        var list = document.getElementById("list");
-        var left = document.getElementById("left");
-        var right = document.getElementById("right");
+    window.onload = function() {
+        //获取所有DOM节点
+        var content = getObj("content");
+        var list = getObj("list");
+        var left = getObj("left");
+        var right = getObj("right");
         var circle = document.getElementById("circle").getElementsByTagName("span");
-        var index = 1;
+        var commend_idx;
+        var timer=null;
+        var time=null;
 
-//        小圆点亮起
-         function showbutton(){
-             //关掉上一个小圆点亮起
-             for(var i=0;i<circle.length;i++){
-                 if(circle[i].className='on'){
-                     circle[i].className='';
-                     break;
-                 }
-             }
-             circle[index-1].className='on';
-         }
-         function animate(offset){
-             var newleft=parseInt(list.style.left)+offset;
-             list.style.left=newleft+"px";
-
-             //无限滚动 图片归为
-             if(newleft>-600){
-                 list.style.left=-2400+"px";
-             }
-             if(newleft<-2400){
-                 list.style.left=-600+"px";
-             }
-//             debugger;
-         }
-
-        left.onclick = function(){
-            if(index == 1){
-                index =5;
-            }
-            else{
-                index-=1;
-            }
-
-            showbutton();
-            animate(600);
-        }
-        right.onclick = function(){
-            if(index == 5){
-                index =1;
-            }
-            else{
-                index+=1;
-            }
-            showbutton();
-            animate(-600);
-        }
-        //按钮切换 offset:偏移量
+        //事件绑定
+        left.addEventListener("click", function () {
+            slide(600, 0, "-2400px");
+        });
+        right.addEventListener("click", function () {
+            slide(-600, -2400, "0px");
+        });
+//        闭包
         for(var i=0;i<circle.length;i++){
-              circle[i].onclick=function(){
-                  //优化
-                  if(this.className=="on"){
-                      return;
-                  }
-                  //
-                  var myindex =parseInt(this.getAttribute('index'));
-                  var offset = (myindex-index)*-600;
-
-                  animate(offset);
-                  index=myindex;
-                  showbutton();
-              }
+            (function(a)//形参
+             {
+                circle[a].onclick=function(){
+                    circle_control(this,a)
+                }
+            })(i)//实参
+       }
+        function circle_control(that,num) {
+            //在修改class前，清空所有class；
+           for(var i=0;i<circle.length;i++){
+               circle[i].setAttribute("class","");
+           }
+            //点击span修改class为“on”；
+           that.setAttribute("class","on");
+            //控制图片移动到当前位置
+          list.style.left=num*(-600)+"px";
         }
+
+
+        function slide(speed, terminal, flag) {
+            var newleft = parseInt(list.style.left);
+            if (newleft === terminal) {
+                list.style.left = flag;
+                newleft = parseInt(list.style.left);
+            }
+            else {
+                newleft += speed;
+                list.style.left = newleft + 'px';
+
+            }
+            console.log(newleft);
+            //通过索引找到对应图片
+            commend_idx=newleft/(-600);
+            //清空样式
+            for (var i = 0; i < circle.length; i++) {
+                circle[i].setAttribute("class", "");
+            }
+            //当前图片对应的小圆点改变样式
+            circle[commend_idx].setAttribute("class","on");
+        }
+
+
+        time=setInterval(function(){
+            slide(600,0,"2400px");
+        },2000);
+       content.onmousemove=function(){
+           clearInterval(timer);
+           clearInterval(time);
+       };
+
+        content.onmouseout=function(){
+            timer=setInterval(function(){
+                slide(-600,-2400,"0px");
+            },2000)
+
+        }
+
+
+
 
     }
 </script>
